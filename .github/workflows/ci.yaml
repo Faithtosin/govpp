@@ -14,22 +14,35 @@ on:
 jobs:
   generate:
     name: generate
-    runs-on: actuated
+    runs-on: ubuntu-latest
+    # These permissions are needed to interact with GitHub's OIDC Token endpoint.
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Run CodeBuild
+        uses: aws-actions/aws-codebuild-run-build@v1
+        with:
+          project-name: github-actions-example
+          buildspec-override: buildspec.yaml
+          env-vars-for-codebuild: |
+            custom,
+            requester,
+            event-name
+        env:
+          custom: my environment variable
+          requester: ${{ github.actor }}
+          event-name: ${{ github.event_name }}
       - uses: actions/setup-go@v1
         with:
           go-version: 1.15.3
-      - name: Docker Build
-        run: |
-          docker build .
-          VPP_VERSION=$(docker run $(docker build -q . --target version))
-          echo "VPP_VERSION=${VPP_VERSION}" >> $GITHUB_ENV
-          TAG=v${VPP_VERSION/\~/-}
-          echo "TAG=${TAG}" >> $GITHUB_ENV
-          docker build -t ghcr.io/${{github.repository}}/vpp:${TAG} . --target vpp
-          docker build -t ghcr.io/${{github.repository}}/vpp-dbg:${TAG} . --target vpp-dbg
       - name: Generate files
         run: go generate ./...
       - name: Check for changes in generated code
