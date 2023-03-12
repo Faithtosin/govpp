@@ -3,20 +3,15 @@ phases:
   install:
     commands:
       # Update libs
-      - apt-get update
   pre_build:
     commands:
       # # Install dependencies
-      # - npm install
-      # - npm run test:ci
   build:
     commands:
       # login to prevent docker rate limit. Credentials passed in as env var from AWS secret manager
       - docker login --username $DOCKER_USER -p $DOCKER_PASSWORD
       - docker build .
-      - VPP_VERSION=$(docker run $(docker build -q . --target version))
-      - echo "VPP_VERSION=${VPP_VERSION}" >> $GITHUB_ENV
-      - TAG=v${VPP_VERSION/\~/-}
-      - echo "TAG=${TAG}" >> $GITHUB_ENV
+      - export VPP_VERSION=$(docker run $(docker build -q . --target version))
+      - export TAG=v${VPP_VERSION/\~/-}
       - docker build -t ghcr.io/${{github.repository}}/vpp:${TAG} . --target vpp
       - docker build -t ghcr.io/${{github.repository}}/vpp-dbg:${TAG} . --target vpp-dbg
