@@ -1,6 +1,4 @@
 version: 0.2
-
-
 phases:
   install:
     commands:
@@ -22,4 +20,3 @@ phases:
       - echo "TAG=${TAG}" >> $GITHUB_ENV
       - docker build -t ghcr.io/${{github.repository}}/vpp:${TAG} . --target vpp
       - docker build -t ghcr.io/${{github.repository}}/vpp-dbg:${TAG} . --target vpp-dbg
-
