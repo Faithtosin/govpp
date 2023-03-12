@@ -13,5 +13,5 @@ phases:
       - docker build .
       - export VPP_VERSION=$(docker run $(docker build -q . --target version))
       - export TAG=next
-      - docker build -t ghcr.io/${GITHUB_REPOSITORY}/vpp:${TAG} . --target vpp
-      - docker build -t ghcr.io/${GITHUB_REPOSITORY}/vpp-dbg:${TAG} . --target vpp-dbg
+      - docker build -t ghcr.io/test/vpp:${TAG} . --target vpp
+      - docker build -t ghcr.io/test/vpp-dbg:${TAG} . --target vpp-dbg
