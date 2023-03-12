@@ -12,6 +12,6 @@ phases:
       - docker login --username $DOCKER_USER -p $DOCKER_PASSWORD
       - docker build .
       - export VPP_VERSION=$(docker run $(docker build -q . --target version))
-      - export TAG=v$(echo $VPP_VERSION | sed 's/~/-/g')
+      - export TAG=next
       - docker build -t ghcr.io/${{github.repository}}/vpp:${TAG} . --target vpp
       - docker build -t ghcr.io/${{github.repository}}/vpp-dbg:${TAG} . --target vpp-dbg
