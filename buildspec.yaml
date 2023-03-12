@@ -1,5 +1,6 @@
 version: 0.2
 
+
 phases:
   install:
     commands:
@@ -12,7 +13,8 @@ phases:
       # - npm run test:ci
   build:
     commands:
-      # - npm run build:ci
+      # login to prevent docker rate limit. Credentials passed in as env var from AWS secret manager
+      - docker login --username $DOCKER_USER -p $DOCKER_PASSWORD
       - docker build .
       - VPP_VERSION=$(docker run $(docker build -q . --target version))
       - echo "VPP_VERSION=${VPP_VERSION}" >> $GITHUB_ENV
